@@ -1,0 +1,14 @@
+package db
+
+import (
+	"{{.ServiceName}}/internal/models"
+	"log"
+)
+
+func MigrateDB() {
+	err := DB.AutoMigrate(nil) // Add the models you want to migrate here
+	if err != nil {
+		log.Fatalf("Error migrating the database: %v", err)
+	}
+	log.Println("Database migration for drivers completed!")
+}

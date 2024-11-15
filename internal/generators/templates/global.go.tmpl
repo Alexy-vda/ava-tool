@@ -1,0 +1,16 @@
+package routers
+
+import (
+	"{{.ServiceName}}/internal/api/handlers"
+	"{{.ServiceName}}/internal/helpers"
+
+	"github.com/gin-gonic/gin"
+)
+
+func GlobalRoutes(router *gin.Engine) {
+	helpers.AddRoute(router, "GET", "/health", handlers.HealthCheck, nil)
+}
+
+func RegisterRoutes(router *gin.Engine) {
+	GlobalRoutes(router)
+}

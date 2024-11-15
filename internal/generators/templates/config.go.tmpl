@@ -1,0 +1,23 @@
+package configs
+
+import (
+	"github.com/spf13/viper"
+)
+
+type Config struct {
+	Port    string
+	GinMode string
+}
+
+func LoadConfig() *Config {
+	// Charger les variables d'environnement
+	viper.AutomaticEnv()
+	viper.SetConfigFile(".env")
+	viper.ReadInConfig()
+
+	// Retourner la configuration avec les services
+	return &Config{
+		Port:    viper.GetString("PORT"),
+		GinMode: viper.GetString("GIN_MODE"),
+	}
+}

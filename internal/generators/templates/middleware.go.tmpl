@@ -1,0 +1,38 @@
+package server
+
+import (
+	"net/http"
+	"github.com/gin-gonic/gin"
+)
+
+// CORSMiddleware ajoute les en-têtes CORS pour autoriser les requêtes cross-origin
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+			c.Writer.Header().Set("Access-Control-Allow-Origin", "*") // Change '*' par une origine spécifique si nécessaire
+			c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE") // Ajoutez les méthodes nécessaires
+			c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, X-Auth-Token") // Ajoutez les en-têtes nécessaires
+
+			if c.Request.Method == "OPTIONS" {
+					c.AbortWithStatus(http.StatusNoContent)
+					return
+			}
+
+			c.Next()
+	}
+}
+
+func OriginMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		origin := c.GetHeader("Origin")
+		realIP := c.GetHeader("X-Real-IP")
+
+		// Vérifier si l'origine correspond à "http://onefem.localhost"
+		if origin == "http://onefem.localhost" && realIP != "" {
+			// Modifier l'origine avec l'IP réelle
+			newOrigin := "http://" + realIP + ":80"
+			c.Request.Header.Set("Origin", newOrigin)
+		}
+
+		c.Next()
+	}
+}

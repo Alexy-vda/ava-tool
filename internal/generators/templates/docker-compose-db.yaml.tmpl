@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  {{.ServiceName}}-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: {{.ServiceName}}_user
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: {{.ServiceName}}_db
+    volumes:
+      - {{.ServiceName}}_db_data:/var/lib/postgresql/data
+    networks:
+      - {{.ServiceName}}-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U {{.ServiceName}}_user -d {{.ServiceName}}_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 1
+
+  {{.ServiceName}}-service:
+    build: .
+    depends_on:
+      {{.ServiceName}}-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: {{.ServiceName}}-db
+      DB_PORT: 5432
+      DB_USER: {{.ServiceName}}_user
+      DB_PASSWORD: onefem2023@@@
+      DB_NAME: {{.ServiceName}}_db
+      PORT: {{.Port}}
+      GIN_MODE: debug
+      SHARE_PATH: /share
+    ports:
+      - "{{.Port}}:{{.Port}}"
+    networks:
+      - {{.ServiceName}}-network
+      - API-network
+    volumes:
+      - /home/${USER}/share:/share
+
+volumes:
+  {{.ServiceName}}_db_data:
+
+networks:
+  {{.ServiceName}}-network:
+    driver: bridge
+  API-network:
+    driver: bridge

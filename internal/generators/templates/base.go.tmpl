@@ -1,0 +1,14 @@
+package models
+
+import (
+	"time"
+	"gorm.io/gorm"
+)
+
+// BaseModel est une structure qui contient des champs communs à tous les modèles
+type BaseModel struct {
+	ID        uint           `gorm:"primaryKey"`
+	CreatedAt time.Time      `gorm:"autoCreateTime"`
+	UpdatedAt time.Time      `gorm:"autoUpdateTime"`
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+}

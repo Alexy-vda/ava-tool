@@ -1,0 +1,18 @@
+stages:
+  - build
+
+variables:
+  GO_IMAGE: golang:1.23.1
+
+before_script:
+  - export GOPATH=$CI_PROJECT_DIR/go
+  - export PATH=$PATH:/usr/local/go/bin
+  - mkdir -p $GOPATH/src/$CI_PROJECT_NAMESPACE
+  - ln -sf $CI_PROJECT_DIR $GOPATH/src/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
+  - cd $GOPATH/src/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
+
+build:
+  stage: build
+  image: $GO_IMAGE
+  script:
+    - go build ./cmd/server/main.go

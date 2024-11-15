@@ -1,0 +1,42 @@
+package server
+
+import (
+	"{{.ServiceName}}/internal/configs"
+	"log"
+
+	"github.com/gin-gonic/gin"
+)
+
+type Server struct {
+	Router *gin.Engine
+	config *configs.Config
+}
+
+func NewServer(config *configs.Config) *Server {
+	switch config.GinMode {
+	case "release":
+		gin.SetMode(gin.ReleaseMode)
+	case "debug":
+		gin.SetMode(gin.DebugMode)
+	case "test":
+		gin.SetMode(gin.TestMode)
+	default:
+		log.Printf("Mode inconnu %s, passage en mode debug par défaut", config.GinMode)
+		gin.SetMode(gin.DebugMode)
+	}
+
+	router := gin.Default()
+
+	router.Use(CORSMiddleware())
+	router.Use(OriginMiddleware())
+
+	return &Server{
+		Router: router,
+		config: config,
+	}
+}
+
+func (s *Server) Start() error {
+	return s.Router.Run(":" + s.config.Port)
+
+}

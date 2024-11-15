@@ -1,0 +1,27 @@
+package helpers
+
+import "sync"
+
+// this is where all the functions related to the origin of the request are stored
+
+// Origins is a concurrent map that stores the origins of the requests
+var origins sync.Map
+
+// StoreOrigin stores the origin of the request
+func StoreOrigin(requestID string, origin string) {
+	origins.Store(requestID, origin)
+}
+
+// GetOrigin retrieves the origin of the request with the given requestID
+func GetOrigin(requestID string) (string, bool) {
+	origin, ok := origins.Load(requestID)
+	if !ok {
+		return "", false
+	}
+	return origin.(string), true
+}
+
+// ConsumeOrigin consumes the origin of the request with the given requestID
+func ConsumeOrigin(requestID string) {
+	origins.Delete(requestID)
+}

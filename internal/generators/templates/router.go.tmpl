@@ -1,0 +1,55 @@
+package helpers
+
+import (
+	"reflect"
+
+	"github.com/gin-gonic/gin"
+)
+
+type Endpoint struct {
+	Path    string                 `json:"path"`
+	Method  string                 `json:"method"`
+	Payload map[string]interface{} `json:"payload,omitempty"`
+}
+
+var Endpoints []Endpoint
+
+func AddRoute(router *gin.Engine, method string, path string, handler gin.HandlerFunc, payload interface{}) {
+	var metadataPayload map[string]interface{}
+	if payload != nil {
+		metadataPayload = ConvertStructToMap(payload)
+	} else {
+		metadataPayload = map[string]interface{}{}
+	}
+
+	Endpoints = append(Endpoints, Endpoint{
+		Path:    path,
+		Method:  method,
+		Payload: metadataPayload,
+	})
+
+	// Ajouter la route au routeur Gin
+	switch method {
+	case "GET":
+		router.GET(path, handler)
+	case "POST":
+		router.POST(path, handler)
+	}
+}
+
+func ConvertStructToMap(dataStruct interface{}) map[string]interface{} {
+	result := make(map[string]interface{})
+	val := reflect.ValueOf(dataStruct)
+	typ := reflect.TypeOf(dataStruct)
+
+	for i := 0; i < val.NumField(); i++ {
+		field := typ.Field(i)
+		fieldType := field.Type.Name()
+		jsonTag := field.Tag.Get("json")
+		if jsonTag == "" {
+			jsonTag = field.Name
+		}
+		result[jsonTag] = fieldType
+	}
+	return result
+}

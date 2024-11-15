@@ -1,0 +1,16 @@
+package helpers
+
+import (
+	"bytes"
+	"net/http"
+)
+
+func RequestConstructor(method string, url string, body []byte, origin string) (*http.Request, error) {
+	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("origin", origin)
+	return req, nil
+}

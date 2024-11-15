@@ -1,0 +1,19 @@
+package main
+
+import (
+	"log"
+
+	"{{.ServiceName}}/internal/api/routers"
+	"{{.ServiceName}}/internal/configs"
+	"{{.ServiceName}}/internal/server"
+)
+
+func main() {
+	config := configs.LoadConfig()
+	s := server.NewServer(config)
+	routers.RegisterRoutes(s.Router)
+
+	if err := s.Start(); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
+}
